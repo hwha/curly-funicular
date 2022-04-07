@@ -1,0 +1,114 @@
+spring:
+  application:
+    name: boilerplate
+
+  datasource:
+    master:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://dev-mysql8-aurora.cluster-csnennfgsbve.us-east-2.rds.amazonaws.com:3306/boilerplate
+      username: admin
+      password: admin63631!
+    slave:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://dev-mysql8-aurora.cluster-ro-csnennfgsbve.us-east-2.rds.amazonaws.com:3306/boilerplate
+      username: admin
+      password: admin63631!
+
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 30000 #default
+      validation-timeout: 5000
+      data-source-properties:
+        prepStmpCache: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        cachePepStmts: true
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update #
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        format_sql: true
+    generate-ddl: true
+
+  redis:
+    host: aw-redis-001.bxb2db.0001.use2.cache.amazonaws.com
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8 # default, pool에 할당될 수 있는 커넥션 최대수 (음수로 하면 무제한)
+        min-idle: 0 # default, pool의 "idle" 커넥션 최대수 (음수로 하면 무제한)
+        max-idle: 8 # default, pool이 바닥났을 때 예외발생 전에 커넥션 할당 차단의 최대 시간 (단위: 밀리세컨드, 음수는 무제한 차단)
+
+  cloud:
+    discovery:
+      enabled: false # eureka server없이 단독실행시 false 처리.
+    loadbalancer:
+      enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetch-registry: true # 레지스트리에 있는 정보를 가져올지에 대한 여부 (디폴트 true)
+    register-with-eureka: true # 레지스트리에 자신을 등록할지에 대한 여부 (디폴트 true)
+    registry-fetch-interval-seconds: 30 # 서비스 목록을 설정한 시간마다 캐싱 (디폴트 30)
+    disable-delta: true # 캐싱 시 변경된 부분만 업데이트할 지 여부 (디폴트 false)
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+feign:
+  circuitbreaker:
+    enabled: true
+  client:
+    config:
+      default:
+        loggerLevel: FULL
+  httpclient:
+    max-connections: 200
+    max-connections-per-route: 50
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  timelimiter:
+    configs:
+      default:
+        cancelRunningFuture: true
+        timeoutDuration: 1s
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+
+logging:
+  level:
+    org:
+      springframework: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 10
+
+google-client:
+  url: http://google.com
+  auth-token : 'sampletoken'
+
+gateway:
+  endpoint: http://localhost:8088
